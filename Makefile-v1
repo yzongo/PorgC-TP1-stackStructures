@@ -1,23 +1,75 @@
-main-stack : test.o stack.o evaluation.o  main-exprString.o
-	gcc test.o stack.o evaluation.o main-expr.o -o main-stack 
+##############################
+#        VARIABLES
+##############################
 
-test.o : test.c  application.h test.h stack.h 
-	gcc -c test.c 
-	
-stack.o :  stack.c  application.h test.h stack.h
-	gcc -c stack.c 
-	
-evaluation.o: evaluation.c  application.h test.h stack.h  evaluation.h
-	gcc -c evaluation.c 
+CC      := gcc
+CFLAGS  := -Wall -Wextra -Werror -std=c11
+LDFLAGS := 
+LDLIBS  :=  # Par exemple : -lm pour la bibliothèque mathématique
 
-evaluationString.o: evaluation.c  application.h test.h stack.h  evaluation.h
-	gcc -c evaluationString.c 
-	
-main-exprString.o : main-exprString.c application.h test.h stack.h  evaluation.h 
-	gcc -c main-exprString.c 
-	
-## main-stack.o:  main-stack.c  application.h test.h stack.h
-	##gcc -c main-stack.c 
-	
+# Tous les fichiers sources
+SRC     := test.c stack.c evaluation.c evaluationString.c main-exprString.c
+
+# Objets générés automatiquement
+OBJ     := $(SRC:.c=.o)
+
+# Exécutable principal
+TARGET  := main-stack
+
+
+##############################
+#        RÈGLE PAR DÉFAUT
+##############################
+
+all: $(TARGET)
+
+
+##############################
+#        LIEN FINAL
+##############################
+
+$(TARGET): $(OBJ)
+	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
+
+
+##############################
+#        PATTERN RULES
+##############################
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+
+##############################
+#        DÉPENDANCES
+##############################
+
+test.o: test.c application.h test.h stack.h
+stack.o: stack.c application.h test.h stack.h
+evaluation.o: evaluation.c application.h test.h stack.h evaluation.h
+evaluationString.o: evaluationString.c application.h test.h stack.h evaluation.h
+main-exprString.o: main-exprString.c application.h test.h stack.h evaluation.h
+
+
+##############################
+#        CLEAN
+##############################
+
+clean:
+	rm -f *.o
+
+fclean: clean
+	rm -f $(TARGET)
+
+re: fclean all
+
+
+##############################
+#  Quality-of-life shortcuts
+##############################
+
+run: $(TARGET)
+	./$(TARGET)
+
 
 
